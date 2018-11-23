@@ -7,48 +7,48 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Models;
 
-namespace MvcMovie.Controllers
+namespace MvcSeries.Controllers
 {
-    public class MoviesController : Controller
+    public class SeriesController : Controller
     {
-        private readonly MvcMovieContext _context;
+        private readonly MvcSerieContext _context;
 
-        public MoviesController(MvcMovieContext context)
+        public SeriesController(MvcSerieContext context)
         {
             _context = context;
         }
 
-        // GET: Movies
+        // GET: Series
         // Requires using Microsoft.AspNetCore.Mvc.Rendering;
-        public async Task<IActionResult> Index(string movieGenre, string searchString)
+        public async Task<IActionResult> Index(string serieGenre, string searchString)
         {
             // Use LINQ to get list of genres.
-            IQueryable<string> genreQuery = from m in _context.Movie
+            IQueryable<string> genreQuery = from m in _context.Serie
                                             orderby m.Genre
                                             select m.Genre;
 
-            var movies = from m in _context.Movie
+            var series = from m in _context.Serie
                          select m;
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                movies = movies.Where(s => s.Title.Contains(searchString));
+                series = series.Where(s => s.Title.Contains(searchString));
             }
 
-            if (!String.IsNullOrEmpty(movieGenre))
+            if (!String.IsNullOrEmpty(serieGenre))
             {
-                movies = movies.Where(x => x.Genre == movieGenre);
+                series = series.Where(x => x.Genre == serieGenre);
             }
 
-            var movieGenreVM = new MovieGenreViewModel();
-            movieGenreVM.Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
-            movieGenreVM.Movies = await movies.ToListAsync();
-            movieGenreVM.SearchString = searchString;
+            var serieGenreVM = new SerieGenreViewModel();
+            serieGenreVM.Genres = new SelectList(await genreQuery.Distinct().ToListAsync());
+            serieGenreVM.Series = await series.ToListAsync();
+            serieGenreVM.SearchString = searchString;
 
-            return View(movieGenreVM);
+            return View(serieGenreVM);
         }
 
-        // GET: Movies/Details/5
+        // GET: Series/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -56,39 +56,39 @@ namespace MvcMovie.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movie
-                .FirstOrDefaultAsync((System.Linq.Expressions.Expression<Func<Movie, bool>>)(m => m.ID == id));
-            if (movie == null)
+            var serie = await _context.Serie
+                .FirstOrDefaultAsync((System.Linq.Expressions.Expression<Func<Serie, bool>>)(m => m.ID == id));
+            if (serie == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            return View(serie);
         }
 
-        // GET: Movies/Create
+        // GET: Series/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Movies/Create
+        // POST: Series/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
+        public async Task<IActionResult> Create([Bind("ID,Title,ReleaseDate,Genre,Price,Rating")] Serie serie)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(movie);
+                _context.Add(serie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(movie);
+            return View(serie);
         }
 
-        // GET: Movies/Edit/5
+        // GET: Series/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -96,22 +96,22 @@ namespace MvcMovie.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movie.FindAsync(id);
-            if (movie == null)
+            var serie = await _context.Serie.FindAsync(id);
+            if (serie == null)
             {
                 return NotFound();
             }
-            return View(movie);
+            return View(serie);
         }
 
-        // POST: Movies/Edit/5
+        // POST: Series/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,ReleaseDate,Genre,Price,Rating")] Serie serie)
         {
-            if (id != movie.ID)
+            if (id != serie.ID)
             {
                 return NotFound();
             }
@@ -120,12 +120,12 @@ namespace MvcMovie.Controllers
             {
                 try
                 {
-                    _context.Update(movie);
+                    _context.Update(serie);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MovieExists(movie.ID))
+                    if (!SerieExists(serie.ID))
                     {
                         return NotFound();
                     }
@@ -136,10 +136,10 @@ namespace MvcMovie.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(movie);
+            return View(serie);
         }
 
-        // GET: Movies/Delete/5
+        // GET: Series/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,30 +147,30 @@ namespace MvcMovie.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movie
-                .FirstOrDefaultAsync((System.Linq.Expressions.Expression<Func<Movie, bool>>)(m => m.ID == id));
-            if (movie == null)
+            var serie = await _context.Serie
+                .FirstOrDefaultAsync((System.Linq.Expressions.Expression<Func<Serie, bool>>)(m => m.ID == id));
+            if (serie == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            return View(serie);
         }
 
-        // POST: Movies/Delete/5
+        // POST: Series/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var movie = await _context.Movie.FindAsync(id);
-            _context.Movie.Remove(movie);
+            var serie = await _context.Serie.FindAsync(id);
+            _context.Serie.Remove(serie);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MovieExists(int id)
+        private bool SerieExists(int id)
         {
-            return _context.Movie.Any((System.Linq.Expressions.Expression<Func<Movie, bool>>)(e => e.ID == id));
+            return _context.Serie.Any((System.Linq.Expressions.Expression<Func<Serie, bool>>)(e => e.ID == id));
         }
     }
 }

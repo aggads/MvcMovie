@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Models;
-using MvcMovie;
-
 namespace MvcMovie
 {
     public class Program
@@ -24,6 +22,19 @@ namespace MvcMovie
                     var context = services.GetRequiredService<MvcMovieContext>();
                     context.Database.Migrate();
                     SeedData.Initialize(services);
+                }
+
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred seeding the DB.");
+                }
+
+                try
+                {
+                    var context = services.GetRequiredService<MvcSerieContext>();
+                    context.Database.Migrate();
+                    SeedSeries.Initialize(services);
                 }
                 catch (Exception ex)
                 {
